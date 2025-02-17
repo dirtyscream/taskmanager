@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/api/projects/{projectId}/tasks")
 public class TaskController {
 
     private final TaskService taskService;
@@ -20,19 +20,19 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @PostMapping
-    public ResponseEntity<TaskModel> createTask(@RequestBody TaskModel taskModel) {
-        return ResponseEntity.ok(taskService.createTask(taskModel));
+    @PostMapping()
+    public ResponseEntity<TaskModel> createTask(@RequestBody TaskModel taskModel, @PathVariable Long projectId) {
+        return ResponseEntity.ok(taskService.createTask(taskModel, projectId));
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskModel>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+    public ResponseEntity<List<TaskModel>> getAllTasks(@PathVariable Long projectId) {
+        return ResponseEntity.ok(taskService.getAllTasks(projectId));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskModel> getTaskById(@PathVariable Long id) {
-        Optional<TaskModel> task = taskService.getTaskById(id);
+    @GetMapping("/{taskId}")
+    public ResponseEntity<TaskModel> getTaskById(@PathVariable Long taskId, @PathVariable Long projectId) {
+        Optional<TaskModel> task = taskService.getTaskById(taskId, projectId);
         if (task.isPresent()) {
             return ResponseEntity.ok(task.get());
         } else {
@@ -40,9 +40,9 @@ public class TaskController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TaskModel> updateTask(@PathVariable Long id, @RequestBody TaskModel taskModel) {
-        TaskModel updatedTask = taskService.updateTask(id, taskModel);
+    @PutMapping("/{taskId}")
+    public ResponseEntity<TaskModel> updateTask(@PathVariable Long taskId, @RequestBody TaskModel taskModel) {
+        TaskModel updatedTask = taskService.updateTask(taskId, taskModel);
         if (updatedTask != null) {
             return ResponseEntity.ok(updatedTask);
         } else {
@@ -50,9 +50,9 @@ public class TaskController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        boolean isDeleted = taskService.deleteTask(id);
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+        boolean isDeleted = taskService.deleteTask(taskId);
         if (isDeleted) {
             return ResponseEntity.ok().build();
         } else {

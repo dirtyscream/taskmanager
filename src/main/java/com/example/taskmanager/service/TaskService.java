@@ -1,5 +1,6 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.models.ProjectModel;
 import com.example.taskmanager.models.TaskModel;
 import com.example.taskmanager.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +19,19 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public TaskModel createTask(TaskModel taskModel) {
+    public TaskModel createTask(TaskModel taskModel, Long projectId) {
+        ProjectModel project = new ProjectModel();
+        project.setId(projectId);
+        taskModel.setProject(project);
         return taskRepository.save(taskModel);
     }
 
-    public List<TaskModel> getAllTasks() {
-        return taskRepository.findAll();
+    public List<TaskModel> getAllTasks(Long projectId) {
+        return taskRepository.findByProjectId(projectId);
     }
 
-    public Optional<TaskModel> getTaskById(Long id) {
-        return taskRepository.findById(id);
+    public Optional<TaskModel> getTaskById(Long taskId, Long projectId) {
+        return taskRepository.findByIdAndProjectId(taskId, projectId);
     }
 
     public TaskModel updateTask(Long id, TaskModel taskModel) {
