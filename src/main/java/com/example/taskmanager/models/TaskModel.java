@@ -27,7 +27,7 @@ public class TaskModel {
     @Column(nullable = false)
     private LocalDateTime deadline;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     @JsonBackReference
     private ProjectModel project;
