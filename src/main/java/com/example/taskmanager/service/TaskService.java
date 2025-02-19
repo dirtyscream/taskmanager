@@ -3,15 +3,13 @@ package com.example.taskmanager.service;
 import com.example.taskmanager.models.ProjectModel;
 import com.example.taskmanager.models.TaskModel;
 import com.example.taskmanager.repository.TaskRepository;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class TaskService {
-
     private final TaskRepository taskRepository;
 
     @Autowired

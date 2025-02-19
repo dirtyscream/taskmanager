@@ -2,17 +2,15 @@ package com.example.taskmanager.controllers;
 
 import com.example.taskmanager.models.TaskModel;
 import com.example.taskmanager.service.TaskService;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/projects/{projectId}/tasks")
 public class TaskController {
-
     private final TaskService taskService;
 
     @Autowired
@@ -21,7 +19,8 @@ public class TaskController {
     }
 
     @PostMapping()
-    public ResponseEntity<TaskModel> createTask(@RequestBody TaskModel taskModel, @PathVariable Long projectId) {
+    public ResponseEntity<TaskModel> createTask(@RequestBody TaskModel taskModel,
+                                                @PathVariable Long projectId) {
         return ResponseEntity.ok(taskService.createTask(taskModel, projectId));
     }
 
@@ -33,11 +32,7 @@ public class TaskController {
     @GetMapping("/{taskId}")
     public ResponseEntity<TaskModel> getTaskById(@PathVariable Long taskId, @PathVariable Long projectId) {
         Optional<TaskModel> task = taskService.getTaskById(taskId, projectId);
-        if (task.isPresent()) {
-            return ResponseEntity.ok(task.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return task.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{taskId}")

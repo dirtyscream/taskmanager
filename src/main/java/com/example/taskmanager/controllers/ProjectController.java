@@ -2,17 +2,15 @@ package com.example.taskmanager.controllers;
 
 import com.example.taskmanager.models.ProjectModel;
 import com.example.taskmanager.service.ProjectService;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/projects")
 public class ProjectController {
-
     private final ProjectService projectService;
 
     @Autowired
@@ -33,15 +31,12 @@ public class ProjectController {
     @GetMapping("/{id}")
     public ResponseEntity<ProjectModel> getProjectById(@PathVariable Long id) {
         Optional<ProjectModel> project = projectService.getProjectById(id);
-        if (project.isPresent()) {
-            return ResponseEntity.ok(project.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return project.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectModel> updateProject(@PathVariable Long id, @RequestBody ProjectModel projectModel) {
+    public ResponseEntity<ProjectModel> updateProject(@PathVariable Long id,
+                                                      @RequestBody ProjectModel projectModel) {
         ProjectModel updatedProject = projectService.updateProject(id, projectModel);
         if (updatedProject != null) {
             return ResponseEntity.ok(updatedProject);
