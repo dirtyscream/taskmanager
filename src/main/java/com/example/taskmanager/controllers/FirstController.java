@@ -3,10 +3,7 @@ package com.example.taskmanager.controllers;
 import com.example.taskmanager.schemas.FirstSchema;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class FirstController {
@@ -19,13 +16,13 @@ public class FirstController {
 
     @GetMapping("/api/project_path/{name}/{amountTasks}")
     public ResponseEntity<FirstSchema> getProjectWithPath(
-            @PathVariable("name") String name,
+            @PathVariable String name,
             @PathVariable String amountTasks) {
         return getResponseFromUrl(name, amountTasks);
     }
 
-    private ResponseEntity<FirstSchema> getResponseFromUrl(@PathVariable("name") String name,
-                                                           @PathVariable String amountTasks) {
+    private ResponseEntity<FirstSchema> getResponseFromUrl(String name,
+                                                           String amountTasks) {
         try {
             int amountTasksInt = Integer.parseInt(amountTasks);
             FirstSchema response = new FirstSchema(name, amountTasksInt);
