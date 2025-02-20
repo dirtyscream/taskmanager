@@ -1,6 +1,6 @@
 package com.example.taskmanager.controllers;
 
-import com.example.taskmanager.models.ProjectModel;
+import com.example.taskmanager.schemas.ProjectSchema;
 import com.example.taskmanager.service.ProjectService;
 import java.util.List;
 import java.util.Optional;
@@ -19,30 +19,28 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectModel> createProject(@RequestBody ProjectModel projectModel) {
-        return ResponseEntity.ok(projectService.createProject(projectModel));
+    public ResponseEntity<ProjectSchema> createProject(@RequestBody ProjectSchema projectSchema) {
+        ProjectSchema createdProject = projectService.createProject(projectSchema);
+        return ResponseEntity.ok(createdProject);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectModel>> getAllProjects() {
-        return ResponseEntity.ok(projectService.getAllProjects());
+    public ResponseEntity<List<ProjectSchema>> getAllProjects() {
+        List<ProjectSchema> projects = projectService.getAllProjects();
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectModel> getProjectById(@PathVariable Long id) {
-        Optional<ProjectModel> project = projectService.getProjectById(id);
+    public ResponseEntity<ProjectSchema> getProjectById(@PathVariable Long id) {
+        Optional<ProjectSchema> project = projectService.getProjectById(id);
         return project.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectModel> updateProject(@PathVariable Long id,
-                                                      @RequestBody ProjectModel projectModel) {
-        ProjectModel updatedProject = projectService.updateProject(id, projectModel);
-        if (updatedProject != null) {
-            return ResponseEntity.ok(updatedProject);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ProjectSchema> updateProject(@PathVariable Long id,
+                                                       @RequestBody ProjectSchema projectSchema) {
+        Optional<ProjectSchema> updatedProject = projectService.updateProject(id, projectSchema);
+        return updatedProject.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -50,8 +48,7 @@ public class ProjectController {
         boolean isDeleted = projectService.deleteProject(id);
         if (isDeleted) {
             return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
     }
 }

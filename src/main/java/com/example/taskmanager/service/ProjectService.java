@@ -1,7 +1,8 @@
 package com.example.taskmanager.service;
 
-import com.example.taskmanager.models.ProjectModel;
+import com.example.taskmanager.models.Project;
 import com.example.taskmanager.repository.ProjectRepository;
+import com.example.taskmanager.schemas.ProjectSchema;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,24 +17,29 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
-    public ProjectModel createProject(ProjectModel projectModel) {
-        return projectRepository.save(projectModel);
+    public ProjectSchema createProject(ProjectSchema projectSchema) {
+        Project project = projectSchema.toEntity();
+        return ProjectSchema.fromEntity(projectRepository.save(project));
     }
 
-    public List<ProjectModel> getAllProjects() {
-        return projectRepository.findAll();
+    public List<ProjectSchema> getAllProjects() {
+        return projectRepository.findAll().stream()
+                .map(ProjectSchema::fromEntity)
+                .toList();
     }
 
-    public Optional<ProjectModel> getProjectById(Long id) {
-        return projectRepository.findById(id);
+    public Optional<ProjectSchema> getProjectById(Long id) {
+        return projectRepository.findById(id)
+                .map(ProjectSchema::fromEntity);
     }
 
-    public ProjectModel updateProject(Long id, ProjectModel projectModel) {
+    public Optional<ProjectSchema> updateProject(Long id, ProjectSchema projectSchema) {
         if (projectRepository.existsById(id)) {
-            projectModel.setId(id);
-            return projectRepository.save(projectModel);
+            Project updatedProject = projectSchema.toEntity();
+            updatedProject.setId(id);
+            return Optional.of(ProjectSchema.fromEntity(projectRepository.save(updatedProject)));
         }
-        return null;
+        return Optional.empty();
     }
 
     public boolean deleteProject(Long id) {
