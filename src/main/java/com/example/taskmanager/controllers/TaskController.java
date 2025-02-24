@@ -45,7 +45,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId, @PathVariable Long projectId) {
         boolean isDeleted = taskService.deleteTask(taskId);
         if (isDeleted) {
             return ResponseEntity.ok().build();
