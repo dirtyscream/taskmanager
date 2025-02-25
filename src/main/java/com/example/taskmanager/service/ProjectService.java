@@ -2,7 +2,7 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.models.Project;
 import com.example.taskmanager.repository.ProjectRepository;
-import com.example.taskmanager.schemas.ProjectSchema;
+import com.example.taskmanager.schemas.ProjectDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,27 +17,27 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
-    public ProjectSchema createProject(ProjectSchema projectSchema) {
-        Project project = projectSchema.toEntity();
-        return ProjectSchema.fromEntity(projectRepository.save(project));
+    public ProjectDTO createProject(ProjectDTO projectDto) {
+        Project project = projectDto.toEntity();
+        return ProjectDTO.fromEntity(projectRepository.save(project));
     }
 
-    public List<ProjectSchema> getAllProjects() {
+    public List<ProjectDTO> getAllProjects() {
         return projectRepository.findAll().stream()
-                .map(ProjectSchema::fromEntity)
+                .map(ProjectDTO::fromEntity)
                 .toList();
     }
 
-    public Optional<ProjectSchema> getProjectById(Long id) {
+    public Optional<ProjectDTO> getProjectById(Long id) {
         return projectRepository.findById(id)
-                .map(ProjectSchema::fromEntity);
+                .map(ProjectDTO::fromEntity);
     }
 
-    public Optional<ProjectSchema> updateProject(Long id, ProjectSchema projectSchema) {
+    public Optional<ProjectDTO> updateProject(Long id, ProjectDTO projectDto) {
         if (projectRepository.existsById(id)) {
-            Project updatedProject = projectSchema.toEntity();
+            Project updatedProject = projectDto.toEntity();
             updatedProject.setId(id);
-            return Optional.of(ProjectSchema.fromEntity(projectRepository.save(updatedProject)));
+            return Optional.of(ProjectDTO.fromEntity(projectRepository.save(updatedProject)));
         }
         return Optional.empty();
     }

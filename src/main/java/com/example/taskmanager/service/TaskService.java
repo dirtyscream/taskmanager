@@ -3,7 +3,7 @@ package com.example.taskmanager.service;
 import com.example.taskmanager.models.Project;
 import com.example.taskmanager.models.Task;
 import com.example.taskmanager.repository.TaskRepository;
-import com.example.taskmanager.schemas.TaskSchema;
+import com.example.taskmanager.schemas.TaskDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,38 +18,38 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public TaskSchema createTask(TaskSchema taskSchema, Long projectId) {
+    public TaskDTO createTask(TaskDTO taskDto, Long projectId) {
         Project project = new Project();
         project.setId(projectId);
 
-        Task task = taskSchema.toEntity();
+        Task task = taskDto.toEntity();
         task.setProject(project);
 
         Task savedTask = taskRepository.save(task);
-        return TaskSchema.fromEntity(savedTask);
+        return TaskDTO.fromEntity(savedTask);
     }
 
-    public List<TaskSchema> getAllTasks(Long projectId) {
+    public List<TaskDTO> getAllTasks(Long projectId) {
         List<Task> tasks = taskRepository.findByProjectId(projectId);
         return tasks.stream()
-                .map(TaskSchema::fromEntity)
+                .map(TaskDTO::fromEntity)
                 .toList();
     }
 
-    public Optional<TaskSchema> getTaskById(Long taskId, Long projectId) {
+    public Optional<TaskDTO> getTaskById(Long taskId, Long projectId) {
         Optional<Task> task = taskRepository.findByIdAndProjectId(taskId, projectId);
-        return task.map(TaskSchema::fromEntity);
+        return task.map(TaskDTO::fromEntity);
     }
 
-    public Optional<TaskSchema> updateTask(Long taskId, Long projectId, TaskSchema taskSchema) {
+    public Optional<TaskDTO> updateTask(Long taskId, Long projectId, TaskDTO taskDto) {
         if (taskRepository.existsById(taskId)) {
-            Task task = taskSchema.toEntity();
+            Task task = taskDto.toEntity();
             Project project = new Project();
             project.setId(projectId);
             task.setId(taskId);
             task.setProject(project);
             Task updatedTask = taskRepository.save(task);
-            return Optional.of(TaskSchema.fromEntity(updatedTask));
+            return Optional.of(TaskDTO.fromEntity(updatedTask));
         }
         return Optional.empty();
     }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class FirstController {
-    @GetMapping("/project_query")
+    @GetMapping("/projectQuery")
     public ResponseEntity<FirstSchema> getProjectWithQuery(
             @RequestParam(value = "name", defaultValue = "None") String name,
             @RequestParam(value = "amountTasks", defaultValue = "0") String amountTasks) {
@@ -25,7 +25,7 @@ public class FirstController {
         }
     }
 
-    @GetMapping("/project_path/{projectId}")
+    @GetMapping("/projectPath/{projectId}")
     public ResponseEntity<Map<String, Integer>> getProjectWithPath(@PathVariable Integer projectId) {
         Map<String, Integer> response = new HashMap<>();
         response.put("projectId", projectId);

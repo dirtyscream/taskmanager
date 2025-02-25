@@ -1,6 +1,6 @@
 package com.example.taskmanager.controllers;
 
-import com.example.taskmanager.schemas.ProjectSchema;
+import com.example.taskmanager.schemas.ProjectDTO;
 import com.example.taskmanager.service.ProjectService;
 import java.util.List;
 import java.util.Optional;
@@ -19,27 +19,27 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectSchema> createProject(@RequestBody ProjectSchema projectSchema) {
-        ProjectSchema createdProject = projectService.createProject(projectSchema);
+    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDto) {
+        ProjectDTO createdProject = projectService.createProject(projectDto);
         return ResponseEntity.ok(createdProject);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectSchema>> getAllProjects() {
-        List<ProjectSchema> projects = projectService.getAllProjects();
+    public ResponseEntity<List<ProjectDTO>> getAllProjects() {
+        List<ProjectDTO> projects = projectService.getAllProjects();
         return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectSchema> getProjectById(@PathVariable Long id) {
-        Optional<ProjectSchema> project = projectService.getProjectById(id);
+    public ResponseEntity<ProjectDTO> getProjectById(@PathVariable Long id) {
+        Optional<ProjectDTO> project = projectService.getProjectById(id);
         return project.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectSchema> updateProject(@PathVariable Long id,
-                                                       @RequestBody ProjectSchema projectSchema) {
-        Optional<ProjectSchema> updatedProject = projectService.updateProject(id, projectSchema);
+    public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id,
+                                                    @RequestBody ProjectDTO projectDto) {
+        Optional<ProjectDTO> updatedProject = projectService.updateProject(id, projectDto);
         return updatedProject.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

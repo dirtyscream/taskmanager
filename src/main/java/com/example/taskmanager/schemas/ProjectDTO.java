@@ -4,13 +4,14 @@ import com.example.taskmanager.models.Project;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProjectSchema {
+public class ProjectDTO {
     private final Long id;
     private final String name;
     private final String description;
 
-    public ProjectSchema(Long id, String name, String description) {
+    public ProjectDTO(Long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -31,8 +32,8 @@ public class ProjectSchema {
         return description;
     }
 
-    public static ProjectSchema fromEntity(Project project) {
-        return new ProjectSchema(
+    public static ProjectDTO fromEntity(Project project) {
+        return new ProjectDTO(
                 project.getId(),
                 project.getName(),
                 project.getDescription()
