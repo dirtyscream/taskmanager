@@ -5,13 +5,16 @@ import com.example.taskmanager.models.Task;
 import com.example.taskmanager.repository.TaskRepository;
 import com.example.taskmanager.schemas.TaskDTO;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final Map<Long, List<Task>> cache = new ConcurrentHashMap<>();
 
     @Autowired
     public TaskService(TaskRepository taskRepository) {
@@ -30,8 +33,8 @@ public class TaskService {
     }
 
     public List<TaskDTO> getAllTasks(Long projectId) {
-        List<Task> tasks = taskRepository.findByProjectId(projectId);
-        return tasks.stream()
+        return cache.computeIfAbsent(projectId, id -> taskRepository.findByProjectId(projectId))
+                .stream()
                 .map(TaskDTO::fromEntity)
                 .toList();
     }
