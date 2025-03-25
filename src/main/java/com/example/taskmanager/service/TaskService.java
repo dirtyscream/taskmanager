@@ -4,6 +4,7 @@ import com.example.taskmanager.models.Project;
 import com.example.taskmanager.models.Task;
 import com.example.taskmanager.repository.TaskRepository;
 import com.example.taskmanager.schemas.TaskDTO;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,10 +34,12 @@ public class TaskService {
     }
 
     public List<TaskDTO> getAllTasks(Long projectId) {
-        return cache.computeIfAbsent(projectId, id -> taskRepository.findByProjectId(projectId))
-                .stream()
-                .map(TaskDTO::fromEntity)
-                .toList();
+        List<Task> tasks = cache.computeIfAbsent(projectId, id -> taskRepository.findByProjectId(projectId));
+        List<TaskDTO> listTaskDto = new ArrayList<>();
+        for (Task task : tasks) {
+            listTaskDto.add(TaskDTO.fromEntity(task));
+        }
+        return listTaskDto;
     }
 
     public Optional<TaskDTO> getTaskById(Long taskId, Long projectId) {
