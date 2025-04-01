@@ -3,6 +3,7 @@ package com.example.taskmanager.service;
 import com.example.taskmanager.models.Project;
 import com.example.taskmanager.repository.ProjectRepository;
 import com.example.taskmanager.schemas.ProjectDTO;
+import com.example.taskmanager.schemas.ProjectTaskDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +49,12 @@ public class ProjectService {
             return true;
         }
         return false;
+    }
+
+    public List<ProjectTaskDTO> getAllInfo() {
+        List<Project> projects = projectRepository.findAllWithTasks();
+        return projects.stream()
+                .map(ProjectTaskDTO::fromEntity)
+                .toList();
     }
 }

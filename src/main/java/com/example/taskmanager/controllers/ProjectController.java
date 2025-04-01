@@ -1,6 +1,7 @@
 package com.example.taskmanager.controllers;
 
 import com.example.taskmanager.schemas.ProjectDTO;
+import com.example.taskmanager.schemas.ProjectTaskDTO;
 import com.example.taskmanager.service.ProjectService;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,12 @@ public class ProjectController {
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDto) {
         ProjectDTO createdProject = projectService.createProject(projectDto);
         return ResponseEntity.ok(createdProject);
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<List<ProjectTaskDTO>> getInfo() {
+        List<ProjectTaskDTO> projectTaskList = projectService.getAllInfo();
+        return ResponseEntity.ok(projectTaskList);
     }
 
     @GetMapping

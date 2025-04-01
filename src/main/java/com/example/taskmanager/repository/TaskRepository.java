@@ -12,6 +12,5 @@ import org.springframework.stereotype.Repository;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     Optional<Task> findByIdAndProjectId(Long taskId, Long projectId);
 
-    @Query("SELECT t FROM Task t WHERE t.project.id = :projectId")
-    List<Task> findByProjectId(@Param("projectId") Long projectId);
+    List<Task> findByProjectId(Long projectId);
 }
