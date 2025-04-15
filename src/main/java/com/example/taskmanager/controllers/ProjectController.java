@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +26,7 @@ public class ProjectController {
 
     @PostMapping
     @Operation(summary = "Создать проект")
-    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDto) {
+    public ResponseEntity<ProjectDTO> createProject(@Valid @RequestBody ProjectDTO projectDto) {
         ProjectDTO createdProject = projectService.createProject(projectDto);
         return ResponseEntity.ok(createdProject);
     }
@@ -53,7 +55,7 @@ public class ProjectController {
     @PutMapping("/{id}")
     @Operation(summary = "Обновить проект по ID")
     public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id,
-                                                    @RequestBody ProjectDTO projectDto) {
+                                                    @Valid @RequestBody ProjectDTO projectDto) {
         Optional<ProjectDTO> updatedProject = projectService.updateProject(id, projectDto);
         return updatedProject.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }

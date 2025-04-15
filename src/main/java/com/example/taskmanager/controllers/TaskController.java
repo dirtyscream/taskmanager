@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class TaskController {
 
     @PostMapping()
     @Operation(summary = "Создать задачу в проекте")
-    public ResponseEntity<TaskDTO> createTask(@RequestBody TaskDTO taskDto,
+    public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO taskDto,
                                               @PathVariable Long projectId) {
         TaskDTO createdTask = taskService.createTask(taskDto, projectId);
         return ResponseEntity.ok(createdTask);
@@ -46,7 +48,7 @@ public class TaskController {
     @PutMapping("/{taskId}")
     @Operation(summary = "Обновить задачу по ID в рамках проекта")
     public ResponseEntity<TaskDTO> updateTask(@PathVariable Long taskId, @PathVariable Long projectId,
-                                              @RequestBody TaskDTO taskDto) {
+                                              @Valid @RequestBody TaskDTO taskDto) {
         Optional<TaskDTO> updatedTask = taskService.updateTask(taskId, projectId, taskDto);
         return updatedTask.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }

@@ -11,17 +11,17 @@ import java.time.LocalDateTime;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskDTO {
-    private final Long id;
+    private Long id;
 
     @NotBlank(message = "Task name is required")
-    @Size(max = 255, message = "Task name must be at most 255 characters")
-    private final String name;
+    @Size(max = 50, message = "Task name must be at most 50 characters")
+    private String name;
 
     @Size(max = 1000, message = "Info must be at most 1000 characters")
-    private final String info;
+    private String info;
 
     @Future(message = "Deadline must be in the future")
-    private final LocalDateTime deadline;
+    private LocalDateTime deadline;
 
     public TaskDTO(Long id, String name, String info, LocalDateTime deadline) {
         this.id = id;

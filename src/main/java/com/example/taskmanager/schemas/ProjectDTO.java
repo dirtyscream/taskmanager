@@ -9,14 +9,14 @@ import jakarta.validation.constraints.Size;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectDTO {
-    private final Long id;
+    private Long id;
 
     @NotBlank(message = "Project name is required")
-    @Size(max = 255, message = "Project name must be at most 255 characters")
-    private final String name;
+    @Size(max = 50, message = "Project name must be at most 50 characters")
+    private String name;
 
     @Size(max = 1000, message = "Description must be at most 1000 characters")
-    private final String description;
+    private String description;
 
     public ProjectDTO(Long id, String name, String description) {
         this.id = id;
