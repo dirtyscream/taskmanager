@@ -1,9 +1,11 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.exceptions.ProjectNotFoundException;
 import com.example.taskmanager.models.Project;
 import com.example.taskmanager.repository.ProjectRepository;
 import com.example.taskmanager.schemas.ProjectDTO;
 import com.example.taskmanager.schemas.ProjectTaskDTO;
+import com.example.taskmanager.schemas.TaskDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,10 @@ public class ProjectService {
 
     public Optional<ProjectDTO> getProjectById(Long id) {
         return projectRepository.findById(id)
-                .map(ProjectDTO::fromEntity);
+                .map(ProjectDTO::fromEntity)
+                .or(() -> {
+                    throw new ProjectNotFoundException(id);
+                });
     }
 
     public Optional<ProjectDTO> updateProject(Long id, ProjectDTO projectDto) {
@@ -40,7 +45,7 @@ public class ProjectService {
             updatedProject.setId(id);
             return Optional.of(ProjectDTO.fromEntity(projectRepository.save(updatedProject)));
         }
-        return Optional.empty();
+        throw new ProjectNotFoundException(id);
     }
 
     public boolean deleteProject(Long id) {
@@ -48,13 +53,22 @@ public class ProjectService {
             projectRepository.deleteById(id);
             return true;
         }
-        return false;
+        throw new ProjectNotFoundException(id);
     }
 
-    public List<ProjectTaskDTO> getAllInfo() {
-        List<Project> projects = projectRepository.findAllWithTasks();
+    public List<ProjectTaskDTO> getAllInfo(String taskName) {
+        List<Project> projects = projectRepository.findAllWithTasks(taskName);
         return projects.stream()
-                .map(ProjectTaskDTO::fromEntity)
+                .map(project -> new ProjectTaskDTO(
+                        project.getId(),
+                        project.getName(),
+                        project.getDescription(),
+                        project.getTasks().stream()
+                                .filter(task -> task.getName().equals(taskName))
+                                .map(TaskDTO::fromEntity)
+                                .toList()
+                ))
                 .toList();
     }
 }
+

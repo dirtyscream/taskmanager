@@ -3,12 +3,19 @@ package com.example.taskmanager.schemas;
 import com.example.taskmanager.models.Project;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectDTO {
     private final Long id;
+
+    @NotBlank(message = "Project name is required")
+    @Size(max = 255, message = "Project name must be at most 255 characters")
     private final String name;
+
+    @Size(max = 1000, message = "Description must be at most 1000 characters")
     private final String description;
 
     public ProjectDTO(Long id, String name, String description) {
