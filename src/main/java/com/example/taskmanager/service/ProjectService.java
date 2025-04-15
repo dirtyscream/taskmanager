@@ -1,6 +1,6 @@
 package com.example.taskmanager.service;
 
-import com.example.taskmanager.exceptions.ProjectNotFoundException;
+import com.example.taskmanager.exceptions.NotFoundException;
 import com.example.taskmanager.models.Project;
 import com.example.taskmanager.repository.ProjectRepository;
 import com.example.taskmanager.schemas.ProjectDTO;
@@ -35,7 +35,7 @@ public class ProjectService {
         return projectRepository.findById(id)
                 .map(ProjectDTO::fromEntity)
                 .or(() -> {
-                    throw new ProjectNotFoundException(id);
+                    throw new NotFoundException("Project not Found");
                 });
     }
 
@@ -45,7 +45,7 @@ public class ProjectService {
             updatedProject.setId(id);
             return Optional.of(ProjectDTO.fromEntity(projectRepository.save(updatedProject)));
         }
-        throw new ProjectNotFoundException(id);
+        throw new NotFoundException("Project not Found");
     }
 
     public boolean deleteProject(Long id) {
@@ -53,7 +53,7 @@ public class ProjectService {
             projectRepository.deleteById(id);
             return true;
         }
-        throw new ProjectNotFoundException(id);
+        throw new NotFoundException("Project not Found");
     }
 
     public List<ProjectTaskDTO> getAllInfo(String taskName) {

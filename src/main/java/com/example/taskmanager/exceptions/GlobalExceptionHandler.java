@@ -32,17 +32,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ExceptionHandler(ProjectNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleProjectNotFound(
-            ProjectNotFoundException ex,
-            HttpServletRequest request
-    ) {
-        return buildErrorResponse(ex.getMessage(), request);
-    }
-
-    @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleTaskNotFound(
-            TaskNotFoundException ex,
+            NotFoundException ex,
             HttpServletRequest request
     ) {
         return buildErrorResponse(ex.getMessage(), request);

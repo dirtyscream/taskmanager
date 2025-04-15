@@ -1,7 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.cache.TaskCache;
-import com.example.taskmanager.exceptions.TaskNotFoundException;
+import com.example.taskmanager.exceptions.NotFoundException;
 import com.example.taskmanager.models.Project;
 import com.example.taskmanager.models.Task;
 import com.example.taskmanager.repository.TaskRepository;
@@ -37,7 +37,7 @@ public class TaskService {
         if (tasks == null) {
             tasks = taskRepository.findByProjectId(projectId);
             if (tasks.isEmpty()) {
-                throw new TaskNotFoundException(projectId);
+                throw new NotFoundException("Task not found");
             }
             taskCache.putTasks(projectId, tasks);
         }
@@ -48,7 +48,7 @@ public class TaskService {
         return taskRepository.findByIdAndProjectId(taskId, projectId)
                 .map(TaskDTO::fromEntity)
                 .or(() -> {
-                    throw new TaskNotFoundException(taskId);
+                    throw new NotFoundException("Task not Found");
                 });
     }
 
@@ -60,7 +60,7 @@ public class TaskService {
             Task updatedTask = taskRepository.save(task);
             taskCache.invalidate(projectId);
             return Optional.of(TaskDTO.fromEntity(updatedTask));
-        }).orElseThrow(() -> new TaskNotFoundException(taskId));
+        }).orElseThrow(() -> new NotFoundException("Task not Found"));
     }
 
     public boolean deleteTask(Long id) {
@@ -68,7 +68,7 @@ public class TaskService {
             taskRepository.deleteById(id);
             taskCache.invalidate(task.getProject().getId());
             return true;
-        }).orElseThrow(() -> new TaskNotFoundException(id));
+        }).orElseThrow(() -> new NotFoundException("Task not Found"));
     }
 }
 
