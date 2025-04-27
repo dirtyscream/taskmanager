@@ -5,6 +5,7 @@ import com.example.taskmanager.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +62,15 @@ public class TaskController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/bulk")
+    @Operation(summary = "Создать несколько задач в проекте")
+    public ResponseEntity<List<TaskDTO>> createTasksBulk(@Valid @RequestBody Collection<TaskDTO> tasksDto,
+                                                         @PathVariable Long projectId) {
+        List<TaskDTO> createdTasks = tasksDto.stream()
+                .map(taskDto -> taskService.createTask(taskDto, projectId))
+                .toList();
+        return ResponseEntity.ok(createdTasks);
     }
 }
