@@ -69,6 +69,43 @@ class TaskServiceTest {
     }
 
     @Test
+    void createTask_WithNullInfo_ShouldReturnTaskDTO() {
+        TaskDTO noInfoDTO = new TaskDTO(null, "Test Task", null, LocalDateTime.now().plusDays(1));
+        Task noInfoTask = Task.builder()
+                .id(1L)
+                .name("Test Task")
+                .info(null)
+                .deadline(LocalDateTime.now().plusDays(1))
+                .project(project)
+                .build();
+
+        when(taskRepository.save(any(Task.class))).thenReturn(noInfoTask);
+
+        TaskDTO result = taskService.createTask(noInfoDTO, 1L);
+
+        assertNotNull(result);
+        assertEquals(noInfoDTO.getName(), result.getName());
+        assertNull(result.getInfo());
+        verify(taskRepository).save(any(Task.class));
+        verify(taskCache).invalidate(1L);
+    }
+
+    @Test
+    void getAllTasks_WhenTasksInCache_ShouldReturnTasksFromCache() {
+        List<Task> cachedTasks = Collections.singletonList(task);
+        when(taskCache.getTasks(1L)).thenReturn(cachedTasks);
+
+        List<TaskDTO> result = taskService.getAllTasks(1L);
+
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals(taskDTO.getName(), result.get(0).getName());
+        verify(taskCache).getTasks(1L);
+        verify(taskRepository, never()).findByProjectId(1L);
+        verify(taskCache, never()).putTasks(anyLong(), anyList());
+    }
+
+    @Test
     void getAllTasks_WhenTasksNotInCache_ShouldReturnTasksFromRepository() {
         when(taskCache.getTasks(1L)).thenReturn(null);
         when(taskRepository.findByProjectId(1L)).thenReturn(Collections.singletonList(task));
@@ -118,6 +155,7 @@ class TaskServiceTest {
         verify(taskCache).invalidate(1L);
     }
 
+
     @Test
     void deleteTask_WhenTaskExists_ShouldReturnTrueAndInvalidateCache() {
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
@@ -130,4 +168,5 @@ class TaskServiceTest {
         verify(taskRepository).deleteById(1L);
         verify(taskCache).invalidate(1L);
     }
+
 }

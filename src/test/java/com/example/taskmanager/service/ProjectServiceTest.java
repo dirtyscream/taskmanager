@@ -48,13 +48,40 @@ class ProjectServiceTest {
     @Test
     void createProject_ShouldReturnProjectDTO() {
         when(projectRepository.save(any(Project.class))).thenReturn(project);
-
         ProjectDTO result = projectService.createProject(projectDTO);
-
         assertNotNull(result);
         assertEquals(projectDTO.getName(), result.getName());
         assertEquals(projectDTO.getDescription(), result.getDescription());
         verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    void createProject_WithNullDescription_ShouldReturnProjectDTO() {
+        ProjectDTO noDescDTO = new ProjectDTO(null, "Test Project", null);
+        Project noDescProject = Project.builder()
+                .id(1L)
+                .name("Test Project")
+                .description(null)
+                .build();
+
+        when(projectRepository.save(any(Project.class))).thenReturn(noDescProject);
+
+        ProjectDTO result = projectService.createProject(noDescDTO);
+
+        assertNotNull(result);
+        assertEquals(noDescDTO.getName(), result.getName());
+        assertNull(result.getDescription());
+        verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    void getAllProjects_WhenNoProjects_ShouldReturnEmptyList() {
+        when(projectRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<ProjectDTO> result = projectService.getAllProjects();
+
+        assertTrue(result.isEmpty());
+        verify(projectRepository).findAll();
     }
 
     @Test
@@ -107,6 +134,65 @@ class ProjectServiceTest {
         assertEquals("Updated Description", result.get().getDescription());
         verify(projectRepository).existsById(1L);
         verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    void updateProject_WhenProjectNotExists_ShouldThrowNotFoundException() {
+        ProjectDTO updatedDTO = new ProjectDTO(null, "Updated Project", "Updated Description");
+        when(projectRepository.existsById(1L)).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> projectService.updateProject(1L, updatedDTO));
+        verify(projectRepository).existsById(1L);
+        verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    void deleteProject_WhenProjectExists_ShouldReturnTrue() {
+        when(projectRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(projectRepository).deleteById(1L);
+
+        boolean result = projectService.deleteProject(1L);
+
+        assertTrue(result);
+        verify(projectRepository).existsById(1L);
+        verify(projectRepository).deleteById(1L);
+    }
+
+    @Test
+    void deleteProject_WhenProjectNotExists_ShouldReturnFalse() {
+        when(projectRepository.existsById(1L)).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> projectService.deleteProject(1L));
+        verify(projectRepository).existsById(1L);
+        verify(projectRepository, never()).deleteById(1L);
+    }
+
+    @Test
+    void getAllInfo_WhenNoProjects_ShouldReturnEmptyList() {
+        when(projectRepository.findAllWithTasks("Test Task")).thenReturn(Collections.emptyList());
+
+        List<ProjectTaskDTO> result = projectService.getAllInfo("Test Task");
+
+        assertTrue(result.isEmpty());
+        verify(projectRepository).findAllWithTasks("Test Task");
+    }
+
+    @Test
+    void getAllInfo_WhenProjectHasNoTasks_ShouldReturnProjectWithEmptyTaskList() {
+        Project projectWithoutTasks = Project.builder()
+                .id(1L)
+                .name("Test Project")
+                .description("Test Description")
+                .tasks(Collections.emptyList())
+                .build();
+
+        when(projectRepository.findAllWithTasks("Non-existent Task")).thenReturn(Collections.singletonList(projectWithoutTasks));
+
+        List<ProjectTaskDTO> result = projectService.getAllInfo("Non-existent Task");
+
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals("Test Project", result.get(0).name());
+        assertTrue(result.get(0).tasks().isEmpty());
+        verify(projectRepository).findAllWithTasks("Non-existent Task");
     }
 
     @Test

@@ -3,11 +3,13 @@
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>/app/logs/app.log</file>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] - %msg%n</pattern>
         </encoder>
     </appender>
 
     <root level="info">
         <appender-ref ref="FILE"/>
     </root>
+    <logger name="org.springframework.web" level="debug"/>
+    <logger name="org.springframework.validation" level="debug"/>
 </configuration>
