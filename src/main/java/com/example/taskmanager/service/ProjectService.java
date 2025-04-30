@@ -6,6 +6,7 @@ import com.example.taskmanager.repository.ProjectRepository;
 import com.example.taskmanager.schemas.ProjectDTO;
 import com.example.taskmanager.schemas.ProjectTaskDTO;
 import com.example.taskmanager.schemas.TaskDTO;
+import com.example.taskmanager.service.VisitService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;

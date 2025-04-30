@@ -1,6 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.cache.TaskCache;
+import com.example.taskmanager.exceptions.NotFoundException;
 import com.example.taskmanager.models.Project;
 import com.example.taskmanager.models.Task;
 import com.example.taskmanager.repository.TaskRepository;
@@ -121,6 +122,15 @@ class TaskServiceTest {
     }
 
     @Test
+    void getAllTasks_WhenNoTasks_ShouldReturnEmptyList() {
+        when(taskCache.getTasks(1L)).thenReturn(null); // Кэш пуст
+        when(taskRepository.findByProjectId(1L)).thenReturn(Collections.emptyList()); // Репозиторий возвращает пустой список
+        assertThrows(NotFoundException.class, () -> taskService.getAllTasks(1L));
+        verify(taskCache).getTasks(1L);
+        verify(taskRepository).findByProjectId(1L);
+    }
+
+    @Test
     void getTaskById_WhenTaskExists_ShouldReturnTaskDTO() {
         when(taskRepository.findByIdAndProjectId(1L, 1L)).thenReturn(Optional.of(task));
 
@@ -128,6 +138,13 @@ class TaskServiceTest {
 
         assertTrue(result.isPresent());
         assertEquals(taskDTO.getName(), result.get().getName());
+        verify(taskRepository).findByIdAndProjectId(1L, 1L);
+    }
+
+    @Test
+    void getTaskById_WhenTaskNotExists_ShouldReturnEmptyOptional() {
+        when(taskRepository.findByIdAndProjectId(1L, 1L)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> taskService.getTaskById(1L, 1L));
         verify(taskRepository).findByIdAndProjectId(1L, 1L);
     }
 
@@ -155,6 +172,17 @@ class TaskServiceTest {
         verify(taskCache).invalidate(1L);
     }
 
+    @Test
+    void updateTask_WhenTaskNotExists_ShouldReturnEmptyOptional() {
+        TaskDTO updatedDTO = new TaskDTO(null, "Updated Task", "Updated Info", LocalDateTime.now().plusDays(2));
+
+        when(taskRepository.findByIdAndProjectId(1L, 1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> taskService.updateTask(1L, 1L, updatedDTO));
+        verify(taskRepository).findByIdAndProjectId(1L, 1L);
+        verify(taskRepository, never()).save(any(Task.class));
+        verify(taskCache, never()).invalidate(anyLong());
+    }
 
     @Test
     void deleteTask_WhenTaskExists_ShouldReturnTrueAndInvalidateCache() {
@@ -169,4 +197,12 @@ class TaskServiceTest {
         verify(taskCache).invalidate(1L);
     }
 
+    @Test
+    void deleteTask_WhenTaskNotExists_ShouldReturnFalse() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> taskService.deleteTask(1L));
+        verify(taskRepository).findById(1L);
+        verify(taskRepository, never()).deleteById(anyLong());
+        verify(taskCache, never()).invalidate(anyLong());
+    }
 }

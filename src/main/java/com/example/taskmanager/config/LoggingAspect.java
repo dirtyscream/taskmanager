@@ -1,4 +1,4 @@
-package com.example.taskmanager.aspects;
+package com.example.taskmanager.config;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
