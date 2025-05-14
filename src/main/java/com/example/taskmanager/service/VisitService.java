@@ -1,7 +1,6 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.repository.VisitRepository;
-import com.example.taskmanager.schemas.VisitDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,20 +21,11 @@ public class VisitService {
     }
 
     public synchronized void incrementVisit(String url) {
-        VisitDTO visitDto = visitRepository.findByUrl(url)
-                .orElseGet(() -> {
-                    VisitDTO newVisitDto = new VisitDTO();
-                    newVisitDto.setUrl(url);
-                    newVisitDto.setVisitCount(0);
-                    return newVisitDto;
-                });
-        visitDto.setVisitCount(visitDto.getVisitCount() + 1);
-        visitRepository.save(visitDto);
+        visitRepository.incrementVisitCount(url);
     }
 
     public long getVisitCount(String url) {
-        return visitRepository.findByUrl(url)
-                .map(VisitDTO::getVisitCount)
-                .orElse(0L);
+        return visitRepository.getVisitCountByUrl(url)
+                .orElse(0);
     }
 }

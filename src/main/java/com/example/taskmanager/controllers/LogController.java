@@ -35,7 +35,7 @@ public class LogController {
             LocalDate logDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
             return logService.initiateLogCollection(logDate)
                     .thenApply(taskId -> ResponseEntity.status(HttpStatus.ACCEPTED).body(taskId.toString()));
-        } catch (Exception e) {
+        } catch (DateTimeParseException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format", e);
         }
     }
@@ -54,28 +54,30 @@ public class LogController {
         return ResponseEntity.ok(status);
     }
 
-    @Operation(summary = "Получить лог файл по дате",
-            description = "Возвращает лог файл за указанную дату в виде файла для скачивания.")
-    @GetMapping("/download-by-date")
-    public CompletableFuture<ResponseEntity<Resource>> getLogFileByDateAsync(
-            @Parameter(description = "Дата лога в формате YYYY-MM-DD", example = "2023-10-27")
-            @RequestParam String date) {
-        try {
-            LocalDate logDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
-            return logService.getLogFileByDateAsync(logDate)
-                    .thenApply(resource -> {
-                        if (resource == null) {
-                            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                        }
-                        return ResponseEntity.ok()
-                                .contentType(MediaType.TEXT_PLAIN)
-                                .header(HttpHeaders.CONTENT_DISPOSITION,
-                                        "attachment; filename=\"logs_" + date + ".log\"")
-                                .body(resource);
-                    });
-        } catch (DateTimeParseException e) {
-            return CompletableFuture.completedFuture(
-                    ResponseEntity.badRequest().body(null));
-        }
+    @Operation(summary = "Получить лог файл по ID задачи",
+            description = "Возвращает лог файл по ID задачи в виде файла для скачивания.")
+    @GetMapping("/download/{taskId}")
+    public CompletableFuture<ResponseEntity<Resource>> getLogFileByTaskId(
+            @Parameter(description = "ID задачи",
+                    example = "f47ac10b-58cc-4372-a567-0e02b2c3d479")
+            @PathVariable UUID taskId) {
+        return logService.getLogFileByTaskId(taskId)
+                .thenApply(resource -> {
+                    if (resource == null) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                    }
+
+                    // Get the task to include date in filename
+                    LogService.TaskStatus taskStatus = logService.getTaskStatus(taskId);
+                    String date = taskStatus.getMessage().contains("for date") ?
+                            taskStatus.getMessage().split("for date ")[1]
+                            : "logs";
+
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.TEXT_PLAIN)
+                            .header(HttpHeaders.CONTENT_DISPOSITION,
+                                    "attachment; filename=\"logs_" + date + ".log\"")
+                            .body(resource);
+                });
     }
 }

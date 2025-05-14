@@ -1,6 +1,5 @@
 package com.example.taskmanager.repository;
 
-import com.example.taskmanager.schemas.VisitDTO;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,18 +7,18 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class VisitRepository {
-    private final Map<String, VisitDTO> visitMap = new ConcurrentHashMap<>();
+    private final Map<String, Integer> visitCountMap = new ConcurrentHashMap<>();
 
-    public Optional<VisitDTO> findByUrl(String url) {
-        return Optional.ofNullable(visitMap.get(url));
+    public Optional<Integer> getVisitCountByUrl(String url) {
+        return Optional.ofNullable(visitCountMap.get(url));
     }
 
-    public synchronized VisitDTO save(VisitDTO visitDto) {
-        visitMap.put(visitDto.getUrl(), visitDto);
-        return visitDto;
+    public synchronized void incrementVisitCount(String url) {
+        int count = visitCountMap.getOrDefault(url, 0) + 1;
+        visitCountMap.put(url, count);
     }
 
     public void deleteAll() {
-        visitMap.clear();
+        visitCountMap.clear();
     }
 }
